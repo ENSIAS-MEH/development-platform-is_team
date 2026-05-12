@@ -1,0 +1,33 @@
+# ================================
+# STAGE 1 : Build
+# On utilise Node.js pour compiler le projet React
+# ================================
+FROM node:20-alpine AS builder
+
+# Définir le dossier de travail
+WORKDIR /app
+
+# Copier package.json en premier (optimisation du cache Docker)
+COPY frontend/package*.json .
+
+# Installer les dépendances
+RUN npm install
+
+# Copier le code source et compiler
+COPY frontend/ .
+RUN npm run build
+
+# ================================
+# STAGE 2 : Run
+# Nginx pour servir les fichiers statiques React
+# ================================
+FROM nginx:alpine
+
+# Copier les fichiers buildés vers Nginx
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Port exposé par Nginx
+EXPOSE 80
+
+# Nginx démarre automatiquement
+CMD ["nginx", "-g", "daemon off;"]
