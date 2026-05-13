@@ -44,7 +44,7 @@ services:
     networks:
       - mentorpath_network
 
-  # Frontend Angular/React
+  # Frontend React
   frontend:
     build:
       context: .
