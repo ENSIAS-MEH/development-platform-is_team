@@ -205,6 +205,7 @@ jobs:
           server_port: 465
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
+          from: ${{ secrets.EMAIL_USERNAME }} 
           subject: "CI Pipeline Notification"
           body: "The CI pipeline has completed successfully."
           to: elansarioumaima93@gmail.com
