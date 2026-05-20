@@ -147,7 +147,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>@{argLine} -Dnet.bytebuddy.experimental=true</argLine>
+                    <argLine>${argLine} -Dnet.bytebuddy.experimental=true</argLine>
                 </configuration>
             </plugin>
 
@@ -157,22 +157,38 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.11</version>
             <executions>
+
                 <execution>
-                     <goals><goal>prepare-agent</goal></goals>
+                     <goals>
+                        <goal>prepare-agent</goal>
+                    </goals>
                 </execution>
+
                 <execution>
+
                     <id>report</id>
                     <phase>test</phase>
-                    <goals><goal>report</goal></goals>
+
+                    <goals>
+                        <goal>report</goal>
+                    </goals>
                 </execution>
                 <execution>
+
                      <id>check</id>
-                     <goals><goal>check</goal></goals>
+                     <phase>verify</phase>
+
+                     <goals>
+                        <goal>check</goal>
+                     </goals>
+
                      <configuration>
+
                 <excludes>
                      <exclude>ma/ensias/mentorpath/MentorPathApplication.class</exclude>
                      <exclude>ma/ensias/mentorpath/config/**</exclude>
                      <exclude>ma/ensias/mentorpath/security/**</exclude>
+
                      <exclude>ma/ensias/mentorpath/user/entity/**</exclude>
                      <exclude>ma/ensias/mentorpath/user/dto/**</exclude>
                      <exclude>ma/ensias/mentorpath/user/mapper/**</exclude>
