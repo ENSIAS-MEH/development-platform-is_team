@@ -2,14 +2,17 @@ name: MentorPath CI Pipeline
 
 # Se déclenche à chaque push ou pull request sur develop et main
 on:
+
   push:
     # Le pipeline se lance automatiquement quand :
-      # Quelqu'un push sur main, develop, ou n'importe quelle branche feature/*
+      # Quelqu'un push sur develop
     branches: [develop]
       # Quelqu'un ouvre une Pull Request vers main ou develop
   pull_request:
     branches: [main, develop]
+
 jobs:
+  # first job: build and test the backend
   build-and-test:
     name: Build and Test Backend
     # GitHub va créer une VM Linux pour éxécuter notre pipeline
@@ -37,8 +40,13 @@ jobs:
           # ~ = le dossier home de l'utilisateur sur la VM Linux.
           path: ~/.m2 # means ~/.m2  =  /home/runner/.m2
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+
+      # 4.1 Give permission to Maven Wrapper
+      - name: Give execute permission to mvnw
+        run: chmod +x mvnw
+        working-directory: backend
       
-      # 4. Compiler et lancer les tests 
+      # 4.2 Compiler et lancer les tests 
       - name: Build and Test
         run: ./mvnw clean verify
         working-directory: backend
