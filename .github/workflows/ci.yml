@@ -53,9 +53,10 @@ jobs:
       
       # 5. Vérifier la coverage jaCOCO >=80%
       # Si coverage < 80% → pipeline refuse le merge
-      - name: Check coverage
-        run: ./mvnw jacoco:check
-        working-directory: backend
+      # i comment this step  because already do it by verify
+      #- name: Check coverage
+        #run: ./mvnw jacoco:check
+        #working-directory: backend
       
       # 6. Publier le rapport de coverage sur GitHub (pour le consulter dans l'onglet "Actions" → "Build and Test Backend" → "Artifacts")
       - name: Upload coverage report
