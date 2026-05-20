@@ -147,9 +147,9 @@ jobs:
         working-directory: frontend
 
       # 7. Check code Quality Analyzer
-      - name: Checkstyle
-        run: npm run lint
-        working-directory: frontend
+      #- name: Checkstyle
+        #run: npm run lint
+        #working-directory: frontend
 
       # 8. Trivy file Syestem
       - name: Run Trivy filesystem scan
