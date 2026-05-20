@@ -7,7 +7,7 @@ import './Profile.css';
 const FILIERES = ['2IA', 'BI', 'GL', 'IDF', 'IDSIT', 'SSE', 'SSI'];
 
 export default function ProfilePage() {
-  const { user, updateUser } = useAuth();
+  const { updateUser } = useAuth();
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
