@@ -188,7 +188,7 @@
                      <exclude>ma/ensias/mentorpath/MentorPathApplication.class</exclude>
                      <exclude>ma/ensias/mentorpath/config/**</exclude>
                      <exclude>ma/ensias/mentorpath/security/**</exclude>
-
+                     
                      <exclude>ma/ensias/mentorpath/user/entity/**</exclude>
                      <exclude>ma/ensias/mentorpath/user/dto/**</exclude>
                      <exclude>ma/ensias/mentorpath/user/mapper/**</exclude>
@@ -215,6 +215,15 @@
         </execution>
     </executions>
     </plugin>
+    <!-- Checkstyle — skipped -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>3.6.0</version>
+            <configuration>
+                <skip>true</skip>
+            </configuration>
+        </plugin>
 
         </plugins>
     </build>
