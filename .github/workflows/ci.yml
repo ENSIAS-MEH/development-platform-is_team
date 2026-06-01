@@ -13,6 +13,22 @@ env:
   DOCKERHUB_USERNAME: elansarioumaima
 
 jobs:
+ # ─── Job to generate build number ──────────────────────────────────────────
+  prepare:
+    runs-on: ubuntu-22.04
+    outputs:
+      build_number: ${{ steps.build_num.outputs.build_number }}
+      version_tag: ${{ steps.build_num.outputs.version_tag }}
+    steps:
+      - name: Generate build number
+        id: build_num
+        run: |
+          # Use GitHub run number (increments per workflow run)
+          BUILD_NUM="${{ github.run_number }}"
+          echo "build_number=$BUILD_NUM" >> $GITHUB_OUTPUT
+          echo "version_tag=v$BUILD_NUM" >> $GITHUB_OUTPUT
+          echo "Build number: v$BUILD_NUM"
+
   # ─── Job 1: Backend CI ───────────────────────────────────────────────────────
 
   backend-ci:
@@ -109,22 +125,27 @@ jobs:
       # 12. Build the Docker image and tag it for Docker Hub
       - name: Build and Tag Docker Image
         run: |
-          docker build -f docker/Dockerfile.backend -t mentorpath-backend:latest .
-          docker tag mentorpath-backend:latest ${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:latest
+          docker build -f docker/Dockerfile.backend \
+            -t ${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:${{ env.VERSION_TAG }} \
+            -t ${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:latest .
+          echo "Built images:"
+          echo "  - ${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:${{ env.VERSION_TAG }}"
+          echo "  - ${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:latest"
 
       # 13. Scan the built Docker image for OS/library vulnerabilities with Trivy
       - name: Scan Docker Image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: "image"
-          scan-ref: "${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:latest"
+          scan-ref: "${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:${{ env.VERSION_TAG }}"
 
       # 14. Authenticate with Docker Hub and push the image
       - name: Push Docker Image to Docker Hub
         run: |
           echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{env.DOCKERHUB_USERNAME }} --password-stdin
+          docker push ${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:${{ env.VERSION_TAG }}
           docker push ${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:latest
-
+          echo "✅ Pushed both tags"
   # ─── Job 2: Frontend CI ──────────────────────────────────────────────────────
 
   frontend-ci:
@@ -191,22 +212,27 @@ jobs:
       # 10. Build the Docker image and tag it for Docker Hub
       - name: Build and Tag Docker Image
         run: |
-          docker build -f docker/Dockerfile.frontend -t mentorpath-frontend:latest .
-          docker tag mentorpath-frontend:latest ${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:latest
+          docker build -f docker/Dockerfile.frontend \
+            -t ${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:${{ env.VERSION_TAG }} \
+            -t ${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:latest .
+          echo "Built images:"
+          echo "  - ${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:${{ env.VERSION_TAG }}"
+          echo "  - ${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:latest"
 
       # 11. Scan the built Docker image for OS/library vulnerabilities with Trivy
       - name: Scan Docker Image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: "image"
-          scan-ref: "${{ env.DOCKERHUB_USERNAME}}/mentorpath-frontend:latest"
+          scan-ref: "${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:${{ env.VERSION_TAG }}"
 
       # 12. Authenticate with Docker Hub and push the image
       - name: Push Docker Image to Docker Hub
         run: |
-          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{env.DOCKERHUB_USERNAME }} --password-stdin
+          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ env.DOCKERHUB_USERNAME }} --password-stdin
+          docker push ${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:${{ env.VERSION_TAG }}
           docker push ${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:latest
-
+          echo "✅ Pushed both tags"
   # ─── Job 3: Deploy ───────────────────────────────────────────────────────────
   deploy:
     # Only runs after BOTH backend-ci and frontend-ci succeed
@@ -216,7 +242,13 @@ jobs:
     steps:
       # 1. Placeholder deploy step — replace with real deployment logic
       - name: Deploy to staging
-        run: echo "Deploy after both CI jobs pass"
+        run: | 
+          echo "🎉 CI Pipeline Complete!"
+          echo "📦 Backend Image: ${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:${{ env.VERSION_TAG }}"
+          echo "📦 Frontend Image: ${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:${{ env.VERSION_TAG }}"
+          echo "🏷️  Latest tag also points to this version"
+          echo ""
+          echo "🚀 Ready to trigger CD pipeline"
 
       # 2. Send an email notification on pipeline success
       - name: Send email notification
