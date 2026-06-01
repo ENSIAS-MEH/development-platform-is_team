@@ -37,6 +37,9 @@ jobs:
     # donc on 'a pas besoin d'installer qlq chose
     # runs-on: ubuntu-latest => moins stable ,it can break
     runs-on: ubuntu-22.04
+    needs: prepare
+    env:
+      VERSION_TAG: ${{ needs.prepare.outputs.version_tag }}
 
     steps:
       # 1. Check out the repository source code
@@ -151,6 +154,10 @@ jobs:
   frontend-ci:
     name: Build and Test Frontend
     runs-on: ubuntu-22.04
+    needs: prepare  
+    env:
+      VERSION_TAG: ${{ needs.prepare.outputs.version_tag }} 
+
 
     steps:
       # 1. Check out the repository source code
@@ -236,8 +243,10 @@ jobs:
   # ─── Job 3: Deploy ───────────────────────────────────────────────────────────
   deploy:
     # Only runs after BOTH backend-ci and frontend-ci succeed
-    needs: [backend-ci, frontend-ci]
+    needs: [prepare,backend-ci, frontend-ci]
     runs-on: ubuntu-22.04
+    env:
+      VERSION_TAG: ${{ needs.prepare.outputs.version_tag }}
 
     steps:
       # 1. Placeholder deploy step — replace with real deployment logic
