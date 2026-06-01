@@ -5,8 +5,7 @@ on:
   push:
     # Le pipeline se lance automatiquement quand :
     # Quelqu'un push sur develop
-    branches:
-      [develop]
+    branches: [develop]
       # Quelqu'un ouvre une Pull Request vers main ou develop
   pull_request:
     branches: [main, develop]
