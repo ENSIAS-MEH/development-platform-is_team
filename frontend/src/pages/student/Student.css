@@ -217,3 +217,83 @@
   color: var(--gray-400);
   font-size: 0.9rem;
 }
+
+.api-hint {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--warning-light);
+  border-radius: var(--radius);
+}
+
+.star-rating { display: flex; align-items: center; gap: 2px; }
+
+.star-rating .star {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--gray-300);
+  padding: 0 1px;
+  line-height: 1;
+}
+
+.star-rating .star--on { color: #F59E0B; }
+
+.star-rating .star:disabled { cursor: default; }
+
+.star-rating:not(:has(.star:disabled)) .star { cursor: pointer; }
+
+.star-val { margin-left: 6px; font-size: 0.8rem; color: var(--gray-500); }
+
+.btn-ghost-sm {
+  font-size: 0.75rem;
+  color: var(--primary);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.btn-ghost-sm:hover { background: var(--primary-light); }
+
+.btn-ghost {
+  padding: 8px 14px;
+  color: var(--gray-600);
+  border-radius: var(--radius);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 1rem;
+}
+
+.modal-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-card h3 { margin-bottom: 1rem; font-size: 1rem; }
+
+.rating-comment {
+  width: 100%;
+  margin: 1rem 0;
+  padding: 10px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius);
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

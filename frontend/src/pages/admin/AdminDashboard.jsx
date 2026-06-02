@@ -1,58 +1,70 @@
 import React, { useEffect, useState } from 'react';
-import api from '../../api/client';
+import { fetchAllUsers, deleteUser } from '../../api/users';
 import toast from 'react-hot-toast';
 import './Admin.css';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [endpointReady, setEndpointReady] = useState(true);
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('ALL');
   const [stats, setStats] = useState({ total: 0, students: 0, mentors: 0, admins: 0 });
 
   useEffect(() => {
-    api.get('/admin/users')
-      .then((res) => {
-        const data = res.data.data ?? [];
-        setUsers(data);
-        setStats({
-          total: data.length,
-          students: data.filter((u) => u.role === 'STUDENT').length,
-          mentors: data.filter((u) => u.role === 'MENTOR').length,
-          admins: data.filter((u) => u.role === 'ADMIN').length,
-        });
-      })
-      .catch(() => toast.error('Impossible de charger les utilisateurs.'))
-      .finally(() => setLoading(false));
+    fetchAllUsers().then((data) => {
+      if (data === null) {
+        setEndpointReady(false);
+        setUsers([]);
+        return;
+      }
+      setUsers(data);
+      setStats({
+        total: data.length,
+        students: data.filter((u) => u.role === 'STUDENT').length,
+        mentors: data.filter((u) => u.role === 'MENTOR').length,
+        admins: data.filter((u) => u.role === 'ADMIN').length,
+      });
+    }).finally(() => setLoading(false));
   }, []);
 
-  const handleBan = async (userId) => {
-    if (!window.confirm('Bannir cet utilisateur ?')) return;
+  const handleDelete = async (userId) => {
+    if (!window.confirm('Supprimer cet utilisateur ?')) return;
     try {
-      await api.delete(`/admin/users/${userId}`);
+      await deleteUser(userId);
       setUsers((prev) => prev.filter((u) => u.id !== userId));
       toast.success('Utilisateur supprimé.');
-    } catch { /* handled */ }
+    } catch {
+      toast.error('Suppression impossible — vérifiez que GET/DELETE /api/admin/users existe.');
+    }
   };
 
   const filtered = users.filter((u) => {
     const matchRole = filterRole === 'ALL' || u.role === filterRole;
-    const matchSearch = search === '' ||
-      `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(search.toLowerCase());
-    return matchRole && matchSearch;
+    const q = search.toLowerCase();
+    return (
+      matchRole &&
+      (!q || `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(q))
+    );
   });
 
   return (
     <div className="admin-page">
       <div className="page-header">
         <h1 className="page-title">Dashboard Admin</h1>
-        <p className="page-subtitle">Gestion des utilisateurs et modération</p>
+        <p className="page-subtitle">Modération et gestion des utilisateurs [F09]</p>
       </div>
 
-      {/* Stats */}
+      {!endpointReady && (
+        <div className="admin-banner">
+          L&apos;endpoint <code>GET /api/admin/users</code> n&apos;est pas encore exposé par le backend.
+          La modération s&apos;activera dès que M1/M2 l&apos;ajoutera.
+        </div>
+      )}
+
       <div className="stat-cards">
         {[
-          { label: 'Total utilisateurs', value: stats.total, icon: '👥', color: 'blue' },
+          { label: 'Total', value: stats.total, icon: '👥', color: 'blue' },
           { label: 'Étudiants', value: stats.students, icon: '🎓', color: 'teal' },
           { label: 'Mentors', value: stats.mentors, icon: '🧑‍🏫', color: 'amber' },
           { label: 'Admins', value: stats.admins, icon: '🛡️', color: 'red' },
@@ -65,12 +77,11 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Filters */}
       <div className="table-controls">
         <input
           className="search-input"
-          type="text"
-          placeholder="🔍  Rechercher un utilisateur…"
+          type="search"
+          placeholder="Rechercher…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -78,6 +89,7 @@ export default function AdminDashboard() {
           {['ALL', 'STUDENT', 'MENTOR', 'ADMIN'].map((r) => (
             <button
               key={r}
+              type="button"
               className={`role-tab ${filterRole === r ? 'active' : ''}`}
               onClick={() => setFilterRole(r)}
             >
@@ -87,12 +99,11 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Table */}
       <div className="table-card">
         {loading ? (
           <div className="table-empty">Chargement…</div>
         ) : filtered.length === 0 ? (
-          <div className="table-empty">Aucun utilisateur trouvé.</div>
+          <div className="table-empty">Aucun utilisateur à afficher.</div>
         ) : (
           <table className="admin-table">
             <thead>
@@ -116,11 +127,13 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                   <td className="text-muted">{u.email}</td>
-                  <td><span className={`role-badge role-badge--${u.role?.toLowerCase()}`}>{u.role}</span></td>
+                  <td>
+                    <span className={`role-badge role-badge--${u.role?.toLowerCase()}`}>{u.role}</span>
+                  </td>
                   <td className="text-muted">{u.filiere || '—'}</td>
                   <td>
-                    <button className="btn-danger-sm" onClick={() => handleBan(u.id)}>
-                      🗑 Supprimer
+                    <button type="button" className="btn-danger-sm" onClick={() => handleDelete(u.id)}>
+                      Supprimer
                     </button>
                   </td>
                 </tr>

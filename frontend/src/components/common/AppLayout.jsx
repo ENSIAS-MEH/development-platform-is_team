@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import NotificationBell from './NotificationBell';
 import './Layout.css';
 
 const NAV_STUDENT = [
@@ -18,8 +19,8 @@ const NAV_MENTOR = [
 ];
 
 const NAV_ADMIN = [
-  { to: '/admin/dashboard', icon: '📊', label: 'Dashboard' },
-  { to: '/admin/users', icon: '👥', label: 'Utilisateurs' },
+  { to: '/admin/dashboard', icon: '📊', label: 'Modération' },
+  { to: '/admin/analytics', icon: '📈', label: 'Analytique' },
 ];
 
 function getNav(role) {
@@ -32,7 +33,6 @@ export default function AppLayout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-
   const navItems = getNav(user?.role);
 
   const handleLogout = () => {
@@ -46,12 +46,10 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="app-shell">
-      {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="sidebar-overlay" onClick={() => setMobileOpen(false)} />
+        <div className="sidebar-overlay" onClick={() => setMobileOpen(false)} role="presentation" />
       )}
 
-      {/* Sidebar */}
       <aside className={`sidebar ${mobileOpen ? 'sidebar--open' : ''}`}>
         <div className="sidebar-header">
           <span className="sidebar-logo">M</span>
@@ -80,16 +78,17 @@ export default function AppLayout({ children }) {
               <div className="user-role">{user?.role}</div>
             </div>
           </div>
-          <button className="logout-btn" onClick={handleLogout} title="Se déconnecter">
-            <span>↩</span>
+          <button type="button" className="logout-btn" onClick={handleLogout} title="Se déconnecter">
+            ↩
           </button>
         </div>
       </aside>
 
-      {/* Main content */}
       <div className="main-wrapper">
         <header className="top-bar">
-          <button className="hamburger" onClick={() => setMobileOpen(true)}>☰</button>
+          <button type="button" className="hamburger" onClick={() => setMobileOpen(true)} aria-label="Menu">
+            ☰
+          </button>
           <div className="top-bar-right">
             <NotificationBell />
           </div>
@@ -97,13 +96,5 @@ export default function AppLayout({ children }) {
         <main className="page-content">{children}</main>
       </div>
     </div>
-  );
-}
-
-function NotificationBell() {
-  return (
-    <button className="notif-bell" title="Notifications">
-      🔔
-    </button>
   );
 }
