@@ -1,0 +1,59 @@
+# Backend Deployment — Spring Boot API
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: mentorpath
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: elansarioumaima/mentorpath-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/mentorpath_db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: mentorpath_user
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: mentorpath_pass
+            - name: JWT_SECRET
+              value: mentorpath_super_secret_key_2025
+          # Attendre que PostgreSQL soit prêt avant de démarrer
+          # Si le backend crash → Kubernetes le redémarre automatiquement
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 15
+---
+# Service — expose le backend aux autres pods et à l'extérieur
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: mentorpath
+spec:
+  selector:
+    app: backend
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
