@@ -26,7 +26,12 @@ jobs:
             cd /home/ubuntu/mentorpath
 
             # Cloner le repository pour récupérer docker-compose.yml
-            git clone https://github.com/ELANSARIOUMAIMA/development-platform-is_team.git
+            if [ -d "development-platform-is_team" ]; then
+                cd development-platform-is_team && git pull
+            else
+                git clone https://github.com/ENSIAS-MEH/development-platform-is_team.git
+                cd development-platform-is_team
+            fi
             
             # Create .env from secrets
             cat > .env << 'EOF'
