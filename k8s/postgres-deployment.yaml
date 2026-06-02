@@ -1,0 +1,47 @@
+# PostgreSQL Deployment — base de données relationnelle
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: mentorpath
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: mentorpath_db
+            - name: POSTGRES_USER
+              value: mentorpath_user
+            - name: POSTGRES_PASSWORD
+              value: mentorpath_pass
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-data
+          emptyDir: {}
+---
+# Service — expose PostgreSQL aux autres pods
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: mentorpath
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
