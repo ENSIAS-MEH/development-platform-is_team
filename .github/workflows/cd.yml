@@ -4,12 +4,6 @@ on:
     # Déclenchement manuel (pour tester)
   workflow_dispatch:
 
-  workflow_run:
-    workflows: ["MentorPath CI Pipeline"]
-    types:
-      - completed
-    branches: [develop]
-
 env:
   DOCKERHUB_USERNAME: elansarioumaima
 

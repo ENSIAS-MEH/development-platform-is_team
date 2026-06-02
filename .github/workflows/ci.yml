@@ -271,3 +271,20 @@ jobs:
           subject: "CI Pipeline Notification"
           body: "The CI pipeline has completed successfully."
           to: elansarioumaima93@gmail.com
+# À la fin de votre ci.yml, après le job "deploy"
+  trigger-cd:
+    name: Trigger CD Pipeline
+    needs: [prepare, backend-ci, frontend-ci, deploy]
+    runs-on: ubuntu-22.04
+    if: success()
+    steps:
+      - name: Trigger CD workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'cd.yml',
+              ref: 'develop',
+            });
