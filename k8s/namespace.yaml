@@ -1,0 +1,8 @@
+# Namespace — espace isolé pour tous les resources MentorPath
+# Comme un dossier qui regroupe tous les objets Kubernetes du projet
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mentorpath
+  labels:
+    app: mentorpath
