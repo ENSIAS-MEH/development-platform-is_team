@@ -80,9 +80,86 @@ la transmission du savoir entre promotions est souvent **informelle et non struc
 
 ---
 
-## 🛠️ Technologies 
+## 🛠️ Technologies
 
+### Backend
+| Technologie | Version | Rôle |
+|------------|---------|------|
+| Spring Boot | 3.2.5 | Framework backend |
+| Java | 17 | Langage |
+| PostgreSQL | 15 | Base de données |
+| Redis | 7 | Cache |
+| JWT | - | Authentification |
+| BCrypt | - | Hashage mots de passe |
+| Flyway | 9.22.3 | Migration BDD |
+| Swagger/OpenAPI | 3.0 | Documentation API |
+| JaCoCo | - | Coverage tests |
 
+### Frontend
+| Technologie | Version | Rôle |
+|------------|---------|------|
+| React | 18 | Framework frontend |
+| React Router | v6 | Navigation |
+| Axios | - | Requêtes HTTP |
 
-## 🚀 Installation 
+### DevOps
+| Technologie | Rôle |
+|------------|------|
+| Docker | Containerisation |
+| Docker Compose | Orchestration locale |
+| Kubernetes | Orchestration production |
+| Terraform | Infrastructure as Code |
+| GitHub Actions | CI/CD Pipeline |
+| Trivy | Security scanning |
+| AWS EC2 | Hébergement cloud |
+
+---
+
+## 🚀 Installation
+
+### Prérequis
+- Docker Desktop installé
+- Git installé
+
+### Lancer avec Docker Compose
+```bash
+# 1. Cloner le repo
+git clone https://github.com/ENSIAS-MEH/development-platform-is_team.git
+cd development-platform-is_team
+
+# 2. Créer le fichier .env
+cp .env.example .env
+
+# 3. Lancer l'application
+docker-compose up -d
+
+# 4. Vérifier que tout tourne
+docker ps
+```
+
+### Accès
+- 🌐 **Frontend** → http://localhost:4200
+- 🔗 **Backend API** → http://localhost:8080
+- 📚 **Swagger UI** → http://localhost:8080/swagger-ui.html
+
+### Lancer avec Kubernetes
+```bash
+# 1. Démarrer Minikube
+minikube start
+
+# 2. Appliquer les manifests
+kubectl apply -f k8s/
+
+# 3. Accéder aux services
+minikube service frontend -n mentorpath
+minikube service backend -n mentorpath
+```
+
+### Membres de l'équipe
+| Membre | Rôle |
+|--------|------|
+| M1:Salma Zakour | Lead Backend & Architecture |
+| M2:Imane Raiss | Backend Features & API REST |
+| M3:Aya Esoubai | Frontend & UX |
+| M4:Oumaima El ansari | DevOps, Tests & Qualité | 
 
