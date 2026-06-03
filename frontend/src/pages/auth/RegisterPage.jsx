@@ -12,6 +12,12 @@ const ROLES = [
 
 const FILIERES = ['2IA', 'BI', 'GL', 'IDF', 'IDSIT', 'SSE', 'SSI'];
 
+const ANNEES_ETUDE = [
+  { value: '1', label: '1ère année' },
+  { value: '2', label: '2ème année' },
+  { value: '3', label: '3ème année' },
+];
+
 export default function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -55,6 +61,7 @@ export default function RegisterPage() {
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
+      toast.error('Veuillez corriger les champs en rouge (filière et année d\'étude obligatoires).');
       return;
     }
     setLoading(true);
@@ -66,8 +73,8 @@ export default function RegisterPage() {
       role: form.role,
       filiere: form.filiere,
     };
-    if (form.role === 'STUDENT') payload.anneeEtude = form.anneeEtude;
-    if (form.role === 'MENTOR') payload.promo = form.promo;
+    if (form.role === 'STUDENT') payload.anneeEtude = Number(form.anneeEtude);
+    if (form.role === 'MENTOR') payload.promo = Number(form.promo);
 
     try {
       const user = await register(payload);
@@ -206,8 +213,8 @@ export default function RegisterPage() {
                     className={errors.anneeEtude ? 'input-error' : ''}
                   >
                     <option value="">Choisir…</option>
-                    {['1', '2', '3', '4', '5'].map((a) => (
-                      <option key={a} value={a}>{a}ère année</option>
+                    {ANNEES_ETUDE.map((a) => (
+                      <option key={a.value} value={a.value}>{a.label}</option>
                     ))}
                   </select>
                   {errors.anneeEtude && <span className="field-error">{errors.anneeEtude}</span>}

@@ -6,6 +6,12 @@ import './Profile.css';
 
 const FILIERES = ['2IA', 'BI', 'GL', 'IDF', 'IDSIT', 'SSE', 'SSI'];
 
+const ANNEES_ETUDE = [
+  { value: '1', label: '1ère année' },
+  { value: '2', label: '2ème année' },
+  { value: '3', label: '3ème année' },
+];
+
 export default function ProfilePage() {
   const { updateUser } = useAuth();
   const [form, setForm] = useState(null);
@@ -138,8 +144,8 @@ export default function ProfilePage() {
                 <label htmlFor="anneeEtude">Année d&apos;étude</label>
                 <select id="anneeEtude" name="anneeEtude" value={form.anneeEtude || ''} onChange={handleChange}>
                   <option value="">Choisir…</option>
-                  {['1', '2', '3', '4', '5'].map((a) => (
-                    <option key={a} value={a}>{a}ère année</option>
+                  {ANNEES_ETUDE.map((a) => (
+                    <option key={a.value} value={a.value}>{a.label}</option>
                   ))}
                 </select>
               </div>
