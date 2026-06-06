@@ -1,0 +1,5 @@
+ma\ensias\mentorpath\session\SessionControllerTest.class
+ma\ensias\mentorpath\user\service\UserServiceImplTest.class
+ma\ensias\mentorpath\rating\RatingControllerTest.class
+ma\ensias\mentorpath\auth\service\AuthServiceImplTest.class
+ma\ensias\mentorpath\roadmap\RoadmapControllerTest.class
