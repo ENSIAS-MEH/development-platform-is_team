@@ -22,7 +22,7 @@ mentorpath,ma.ensias.mentorpath,MentorPathApplication,5,3,0,0,2,1,1,1,1,1
 mentorpath,ma.ensias.mentorpath.session.entity,SessionStatus,0,34,0,0,0,4,0,1,0,1
 mentorpath,ma.ensias.mentorpath.session.controller,SessionController,0,58,0,0,0,10,0,5,0,5
 mentorpath,ma.ensias.mentorpath.user.entity,Role,0,34,0,0,0,4,0,1,0,1
-mentorpath,ma.ensias.mentorpath.roadmap.service,RoadmapServiceImpl,5,322,0,8,0,74,1,23,1,19
+mentorpath,ma.ensias.mentorpath.roadmap.service,RoadmapServiceImpl,23,349,6,18,3,80,6,26,1,19
 mentorpath,ma.ensias.mentorpath.roadmap.controller,RoadmapController,0,80,0,0,0,14,0,7,0,7
 mentorpath,ma.ensias.mentorpath.user.mapper,UserMapperImpl,175,0,28,0,61,0,21,0,7,0
 mentorpath,ma.ensias.mentorpath.message.controller,MessageController,0,48,0,0,0,12,0,4,0,4
