@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mentorpath</a> &gt; <a href="index.source.html" class="el_package">ma.ensias.mentorpath.user.mapper</a> &gt; <span class="el_source">UserMapperImpl.java</span></div><h1>UserMapperImpl.java</h1><pre class="source lang-java linenums">package ma.ensias.mentorpath.user.mapper;
+
+import javax.annotation.processing.Generated;
+import ma.ensias.mentorpath.user.dto.UserDTO;
+import ma.ensias.mentorpath.user.entity.MentorProfile;
+import ma.ensias.mentorpath.user.entity.StudentProfile;
+import ma.ensias.mentorpath.user.entity.User;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2026-06-06T18:49:42+0100&quot;,
+    comments = &quot;version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)&quot;
+)
+@Component
+<span class="nc" id="L16">public class UserMapperImpl implements UserMapper {</span>
+
+    @Override
+    public UserDTO studentProfileToDTO(StudentProfile studentProfile) {
+<span class="nc bnc" id="L20" title="All 2 branches missed.">        if ( studentProfile == null ) {</span>
+<span class="nc" id="L21">            return null;</span>
+        }
+
+<span class="nc" id="L24">        UserDTO userDTO = new UserDTO();</span>
+
+<span class="nc" id="L26">        userDTO.setId( studentProfileUserId( studentProfile ) );</span>
+<span class="nc" id="L27">        userDTO.setEmail( studentProfileUserEmail( studentProfile ) );</span>
+<span class="nc" id="L28">        userDTO.setAvatarUrl( studentProfile.getAvatarUrl() );</span>
+<span class="nc" id="L29">        userDTO.setBio( studentProfile.getBio() );</span>
+<span class="nc" id="L30">        userDTO.setFiliere( studentProfile.getFiliere() );</span>
+<span class="nc" id="L31">        userDTO.setFirstName( studentProfile.getFirstName() );</span>
+<span class="nc" id="L32">        userDTO.setLastName( studentProfile.getLastName() );</span>
+
+<span class="nc" id="L34">        userDTO.setRole( studentProfile.getUser().getRole().name() );</span>
+
+<span class="nc" id="L36">        return userDTO;</span>
+    }
+
+    @Override
+    public UserDTO mentorProfileToDTO(MentorProfile mentorProfile) {
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        if ( mentorProfile == null ) {</span>
+<span class="nc" id="L42">            return null;</span>
+        }
+
+<span class="nc" id="L45">        UserDTO userDTO = new UserDTO();</span>
+
+<span class="nc" id="L47">        userDTO.setId( mentorProfileUserId( mentorProfile ) );</span>
+<span class="nc" id="L48">        userDTO.setEmail( mentorProfileUserEmail( mentorProfile ) );</span>
+<span class="nc" id="L49">        userDTO.setAvatarUrl( mentorProfile.getAvatarUrl() );</span>
+<span class="nc" id="L50">        userDTO.setBio( mentorProfile.getBio() );</span>
+<span class="nc" id="L51">        userDTO.setFiliere( mentorProfile.getFiliere() );</span>
+<span class="nc" id="L52">        userDTO.setFirstName( mentorProfile.getFirstName() );</span>
+<span class="nc" id="L53">        userDTO.setLastName( mentorProfile.getLastName() );</span>
+
+<span class="nc" id="L55">        userDTO.setRole( mentorProfile.getUser().getRole().name() );</span>
+
+<span class="nc" id="L57">        return userDTO;</span>
+    }
+
+    private Long studentProfileUserId(StudentProfile studentProfile) {
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if ( studentProfile == null ) {</span>
+<span class="nc" id="L62">            return null;</span>
+        }
+<span class="nc" id="L64">        User user = studentProfile.getUser();</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if ( user == null ) {</span>
+<span class="nc" id="L66">            return null;</span>
+        }
+<span class="nc" id="L68">        Long id = user.getId();</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if ( id == null ) {</span>
+<span class="nc" id="L70">            return null;</span>
+        }
+<span class="nc" id="L72">        return id;</span>
+    }
+
+    private String studentProfileUserEmail(StudentProfile studentProfile) {
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if ( studentProfile == null ) {</span>
+<span class="nc" id="L77">            return null;</span>
+        }
+<span class="nc" id="L79">        User user = studentProfile.getUser();</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if ( user == null ) {</span>
+<span class="nc" id="L81">            return null;</span>
+        }
+<span class="nc" id="L83">        String email = user.getEmail();</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        if ( email == null ) {</span>
+<span class="nc" id="L85">            return null;</span>
+        }
+<span class="nc" id="L87">        return email;</span>
+    }
+
+    private Long mentorProfileUserId(MentorProfile mentorProfile) {
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if ( mentorProfile == null ) {</span>
+<span class="nc" id="L92">            return null;</span>
+        }
+<span class="nc" id="L94">        User user = mentorProfile.getUser();</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        if ( user == null ) {</span>
+<span class="nc" id="L96">            return null;</span>
+        }
+<span class="nc" id="L98">        Long id = user.getId();</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if ( id == null ) {</span>
+<span class="nc" id="L100">            return null;</span>
+        }
+<span class="nc" id="L102">        return id;</span>
+    }
+
+    private String mentorProfileUserEmail(MentorProfile mentorProfile) {
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        if ( mentorProfile == null ) {</span>
+<span class="nc" id="L107">            return null;</span>
+        }
+<span class="nc" id="L109">        User user = mentorProfile.getUser();</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if ( user == null ) {</span>
+<span class="nc" id="L111">            return null;</span>
+        }
+<span class="nc" id="L113">        String email = user.getEmail();</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        if ( email == null ) {</span>
+<span class="nc" id="L115">            return null;</span>
+        }
+<span class="nc" id="L117">        return email;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
