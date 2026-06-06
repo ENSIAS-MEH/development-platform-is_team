@@ -8,6 +8,7 @@ const NAV_STUDENT = [
   { to: '/student/roadmaps', icon: '🗺️', label: 'Mes Roadmaps' },
   { to: '/student/sessions', icon: '📅', label: 'Mes Sessions' },
   { to: '/student/mentors', icon: '🔍', label: 'Chercher un mentor' },
+  { to: '/student/messages', icon: '💬', label: 'Messages' },
   { to: '/student/profile', icon: '👤', label: 'Mon Profil' },
 ];
 

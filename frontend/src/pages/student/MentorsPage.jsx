@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { fetchMentors } from '../../api/users';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { mentorsAPI } from '../../api/mentors';
+import { ratingsAPI } from '../../api/ratings';
+import { messagesAPI } from '../../api/messages';
 import StarRating from '../../components/common/StarRating';
 import toast from 'react-hot-toast';
+import { FILIERES } from '../../api/utils';
 import './Student.css';
 
-const FILIERES = ['Toutes', '2IA', 'BI', 'GL', 'IDF', 'IDSIT', 'SSE', 'SSI'];
+const FILIERE_TABS = ['Toutes', ...FILIERES];
 
-function MentorCard({ mentor, onRate }) {
+function MentorCard({ mentor, onRate, onMessage }) {
   const initials = `${mentor.firstName?.[0] ?? ''}${mentor.lastName?.[0] ?? ''}`.toUpperCase();
+  const rating = mentor.rating != null ? Number(mentor.rating) : 0;
+
   return (
     <article className="mentor-card">
       <div className="mentor-card-header">
@@ -15,62 +21,99 @@ function MentorCard({ mentor, onRate }) {
         <div className="mentor-info">
           <div className="mentor-name">{mentor.firstName} {mentor.lastName}</div>
           <div className="mentor-filiere">
-            {mentor.filiere || '—'} · Promo {mentor.promo || '—'}
+            {mentor.filiere || '—'} · Promo {mentor.promo ?? '—'}
+            {mentor.available === false && ' · Indisponible'}
           </div>
         </div>
       </div>
       {mentor.bio && <p className="mentor-bio">{mentor.bio}</p>}
+      {mentor.expertise && <p className="mentor-expertise">Compétences : {mentor.expertise}</p>}
       <div className="mentor-card-footer">
-        <StarRating value={mentor.averageRating ?? 0} />
-        <button type="button" className="btn-ghost-sm" onClick={() => onRate(mentor)}>
-          Noter
-        </button>
+        <StarRating value={rating} />
+        <div className="mentor-actions">
+          <button type="button" className="btn-ghost-sm" onClick={() => onMessage(mentor)}>
+            Message
+          </button>
+          <button type="button" className="btn-ghost-sm" onClick={() => onRate(mentor)}>
+            Noter
+          </button>
+        </div>
       </div>
     </article>
   );
 }
 
 export default function MentorsPage() {
+  const navigate = useNavigate();
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [apiHint, setApiHint] = useState(false);
   const [search, setSearch] = useState('');
   const [filiere, setFiliere] = useState('Toutes');
+  const [minRating, setMinRating] = useState('');
+  const [availableOnly, setAvailableOnly] = useState(false);
   const [ratingModal, setRatingModal] = useState(null);
   const [draftRating, setDraftRating] = useState(0);
   const [comment, setComment] = useState('');
 
-  useEffect(() => {
-    fetchMentors()
-      .then((data) => {
-        setMentors(data);
-        if (data.length === 0) setApiHint(true);
-      })
+  const loadMentors = useCallback(() => {
+    setLoading(true);
+    const params = {};
+    if (filiere !== 'Toutes') params.filiere = filiere;
+    if (minRating) params.minRating = minRating;
+    if (availableOnly) params.available = true;
+
+    mentorsAPI
+      .search(params)
+      .then((data) => setMentors(data ?? []))
+      .catch(() => toast.error('Impossible de charger les mentors.'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [filiere, minRating, availableOnly]);
+
+  useEffect(() => {
+    loadMentors();
+  }, [loadMentors]);
 
   const filtered = mentors.filter((m) => {
-    const matchFiliere = filiere === 'Toutes' || m.filiere === filiere;
     const q = search.toLowerCase();
-    const matchSearch =
-      !q || `${m.firstName} ${m.lastName} ${m.bio ?? ''}`.toLowerCase().includes(q);
-    return matchFiliere && matchSearch;
+    return (
+      !q ||
+      `${m.firstName} ${m.lastName} ${m.bio ?? ''} ${m.expertise ?? ''}`.toLowerCase().includes(q)
+    );
   });
 
-  const submitRating = () => {
-    toast.success(
-      `Note enregistrée localement (${draftRating}/5). Brancher POST /api/mentors/{id}/reviews quand M2 sera prêt.`
-    );
-    setRatingModal(null);
-    setDraftRating(0);
-    setComment('');
+  const submitRating = async () => {
+    if (!ratingModal || !draftRating) return;
+    try {
+      await ratingsAPI.rate({
+        mentorId: ratingModal.id,
+        score: draftRating,
+        comment: comment.trim() || undefined,
+      });
+      toast.success('Évaluation envoyée !');
+      setRatingModal(null);
+      setDraftRating(0);
+      setComment('');
+      loadMentors();
+    } catch {
+      /* intercepteur */
+    }
+  };
+
+  const startMessage = async (mentor) => {
+    try {
+      await messagesAPI.createConversation(mentor.id);
+      toast.success('Conversation ouverte.');
+      navigate('/student/messages');
+    } catch {
+      /* intercepteur */
+    }
   };
 
   return (
     <div className="student-page">
       <div className="page-header">
         <h1 className="page-title">Trouver un mentor</h1>
-        <p className="page-subtitle">Filtres par filière et recherche textuelle</p>
+        <p className="page-subtitle">Recherche avancée — filière, note, disponibilité</p>
       </div>
 
       <div className="mentor-filters">
@@ -81,8 +124,20 @@ export default function MentorsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <div className="filter-row">
+          <label className="filter-check">
+            <input type="checkbox" checked={availableOnly} onChange={(e) => setAvailableOnly(e.target.checked)} />
+            Disponibles uniquement
+          </label>
+          <select value={minRating} onChange={(e) => setMinRating(e.target.value)} className="filter-select">
+            <option value="">Note min.</option>
+            {[4, 3, 2, 1].map((r) => (
+              <option key={r} value={r}>{r}+ étoiles</option>
+            ))}
+          </select>
+        </div>
         <div className="filiere-tabs">
-          {FILIERES.map((f) => (
+          {FILIERE_TABS.map((f) => (
             <button
               key={f}
               type="button"
@@ -95,22 +150,14 @@ export default function MentorsPage() {
         </div>
       </div>
 
-      {apiHint && !loading && (
-        <p className="api-hint">
-          Endpoint <code>GET /api/users?role=MENTOR</code> non disponible — affichage vide en attendant M2 (F11).
-        </p>
-      )}
-
       {loading ? (
         <div className="page-loading">Chargement des mentors…</div>
       ) : filtered.length === 0 ? (
-        <div className="empty-state">
-          <p>Aucun mentor trouvé pour ces critères.</p>
-        </div>
+        <div className="empty-state"><p>Aucun mentor trouvé.</p></div>
       ) : (
         <div className="mentors-grid">
           {filtered.map((m) => (
-            <MentorCard key={m.id ?? m.email} mentor={m} onRate={setRatingModal} />
+            <MentorCard key={m.id} mentor={m} onRate={setRatingModal} onMessage={startMessage} />
           ))}
         </div>
       )}
@@ -128,12 +175,8 @@ export default function MentorsPage() {
               onChange={(e) => setComment(e.target.value)}
             />
             <div className="modal-actions">
-              <button type="button" className="btn-ghost" onClick={() => setRatingModal(null)}>
-                Annuler
-              </button>
-              <button type="button" className="btn-primary" onClick={submitRating} disabled={!draftRating}>
-                Envoyer
-              </button>
+              <button type="button" className="btn-ghost" onClick={() => setRatingModal(null)}>Annuler</button>
+              <button type="button" className="btn-primary" onClick={submitRating} disabled={!draftRating}>Envoyer</button>
             </div>
           </div>
         </div>

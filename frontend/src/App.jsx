@@ -17,6 +17,7 @@ import ProfilePage from './pages/student/ProfilePage';
 import MentorSessionsPage from './pages/mentor/MentorSessionsPage';
 import MentorRoadmapsPage from './pages/mentor/MentorRoadmapsPage';
 import MentorMessagesPage from './pages/mentor/MentorMessagesPage';
+import StudentMessagesPage from './pages/student/StudentMessagesPage';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
@@ -54,6 +55,7 @@ export default function App() {
               <Route path="/student/roadmaps" element={<WithLayout><RoadmapsPage /></WithLayout>} />
               <Route path="/student/sessions" element={<WithLayout><SessionsPage /></WithLayout>} />
               <Route path="/student/mentors" element={<WithLayout><MentorsPage /></WithLayout>} />
+              <Route path="/student/messages" element={<WithLayout><StudentMessagesPage /></WithLayout>} />
               <Route path="/student/profile" element={<WithLayout><ProfilePage /></WithLayout>} />
             </Route>
 

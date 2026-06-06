@@ -27,11 +27,7 @@ export default function NotificationBell() {
             </div>
             {loading && <p className="notif-empty">Chargement…</p>}
             {!loading && items.length === 0 && (
-              <p className="notif-empty">
-                Aucune notification pour le moment.
-                <br />
-                <small>Le flux temps réel sera branché quand M2 livrera <code>/api/notifications</code>.</small>
-              </p>
+              <p className="notif-empty">Aucune notification pour le moment.</p>
             )}
             <ul className="notif-list">
               {items.map((n) => (
