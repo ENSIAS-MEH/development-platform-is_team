@@ -1,4 +1,4 @@
-package ma.ensias.mentorpath.roadmap.security;
+package ma.ensias.mentorpath.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

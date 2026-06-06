@@ -5,7 +5,7 @@ import ma.ensias.mentorpath.auth.dto.LoginRequest;
 import ma.ensias.mentorpath.auth.dto.RegisterRequest;
 import ma.ensias.mentorpath.auth.service.impl.AuthServiceImpl;
 import ma.ensias.mentorpath.exception.EmailAlreadyUsedException;
-import ma.ensias.mentorpath.roadmap.security.JwtUtil;
+import ma.ensias.mentorpath.security.JwtUtil;
 import ma.ensias.mentorpath.user.entity.Role;
 import ma.ensias.mentorpath.user.entity.User;
 import ma.ensias.mentorpath.user.repository.MentorProfileRepository;

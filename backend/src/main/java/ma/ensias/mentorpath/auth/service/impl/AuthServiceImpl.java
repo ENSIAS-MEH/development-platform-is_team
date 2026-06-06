@@ -6,7 +6,7 @@ import ma.ensias.mentorpath.auth.dto.LoginRequest;
 import ma.ensias.mentorpath.auth.dto.RegisterRequest;
 import ma.ensias.mentorpath.auth.service.AuthService;
 import ma.ensias.mentorpath.exception.EmailAlreadyUsedException;
-import ma.ensias.mentorpath.roadmap.security.JwtUtil;
+import ma.ensias.mentorpath.security.JwtUtil;
 import ma.ensias.mentorpath.user.entity.*;
 import ma.ensias.mentorpath.user.repository.*;
 import org.springframework.security.authentication.*;
