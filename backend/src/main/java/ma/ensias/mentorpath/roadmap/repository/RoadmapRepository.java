@@ -22,11 +22,13 @@ public interface RoadmapRepository extends JpaRepository<Roadmap, Long> {
     /** Trouve toutes les roadmaps par filière */
     List<Roadmap> findByFiliere(String filiere);
 
-    /** JPQL — Recherche roadmaps par filière et mot clé */
-    @Query("SELECT r FROM Roadmap r WHERE " +
-           "(:filiere IS NULL OR r.filiere = :filiere) AND " +
-           "(:keyword IS NULL OR LOWER(r.title) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    List<Roadmap> searchRoadmaps(
+    /** JPQL — Recherche par mot clé dans le titre */
+    @Query("SELECT r FROM Roadmap r WHERE LOWER(r.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Roadmap> searchByKeyword(@Param("keyword") String keyword);
+
+    /** JPQL — Recherche par filière et mot clé */
+    @Query("SELECT r FROM Roadmap r WHERE r.filiere = :filiere AND LOWER(r.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Roadmap> searchByFiliereAndKeyword(
         @Param("filiere") String filiere,
         @Param("keyword") String keyword
     );
