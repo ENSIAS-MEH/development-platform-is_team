@@ -1,7 +1,8 @@
 package ma.ensias.mentorpath.config;
 
 import lombok.RequiredArgsConstructor;
-import ma.ensias.mentorpath.security.JwtFilter;
+import ma.ensias.mentorpath.roadmap.security.JwtFilter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

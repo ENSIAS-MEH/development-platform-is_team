@@ -1,4 +1,4 @@
-package ma.ensias.mentorpath.security;
+package ma.ensias.mentorpath.roadmap.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

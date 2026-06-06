@@ -1,4 +1,4 @@
-package ma.ensias.mentorpath.security;
+package ma.ensias.mentorpath.roadmap.security;
 
 import lombok.RequiredArgsConstructor;
 import ma.ensias.mentorpath.user.entity.User;
