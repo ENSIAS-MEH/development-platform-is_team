@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-06-06T15:33:21+0100",
+    date = "2026-06-06T15:42:22+0100",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -25,11 +25,11 @@ public class UserMapperImpl implements UserMapper {
 
         userDTO.setId( studentProfileUserId( studentProfile ) );
         userDTO.setEmail( studentProfileUserEmail( studentProfile ) );
+        userDTO.setAvatarUrl( studentProfile.getAvatarUrl() );
+        userDTO.setBio( studentProfile.getBio() );
+        userDTO.setFiliere( studentProfile.getFiliere() );
         userDTO.setFirstName( studentProfile.getFirstName() );
         userDTO.setLastName( studentProfile.getLastName() );
-        userDTO.setFiliere( studentProfile.getFiliere() );
-        userDTO.setBio( studentProfile.getBio() );
-        userDTO.setAvatarUrl( studentProfile.getAvatarUrl() );
 
         userDTO.setRole( studentProfile.getUser().getRole().name() );
 
@@ -46,11 +46,11 @@ public class UserMapperImpl implements UserMapper {
 
         userDTO.setId( mentorProfileUserId( mentorProfile ) );
         userDTO.setEmail( mentorProfileUserEmail( mentorProfile ) );
+        userDTO.setAvatarUrl( mentorProfile.getAvatarUrl() );
+        userDTO.setBio( mentorProfile.getBio() );
+        userDTO.setFiliere( mentorProfile.getFiliere() );
         userDTO.setFirstName( mentorProfile.getFirstName() );
         userDTO.setLastName( mentorProfile.getLastName() );
-        userDTO.setFiliere( mentorProfile.getFiliere() );
-        userDTO.setBio( mentorProfile.getBio() );
-        userDTO.setAvatarUrl( mentorProfile.getAvatarUrl() );
 
         userDTO.setRole( mentorProfile.getUser().getRole().name() );
 
