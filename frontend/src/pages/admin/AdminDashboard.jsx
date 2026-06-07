@@ -24,11 +24,6 @@ export default function AdminDashboard() {
         <p className="page-subtitle">Vue d&apos;ensemble de la plateforme [F09]</p>
       </div>
 
-      <div className="admin-banner">
-        La modération utilisateurs (<code>/api/admin/users</code>) n&apos;est pas encore exposée.
-        Voici les statistiques disponibles via les API M2.
-      </div>
-
       <div className="stat-cards">
         <div className="stat-card stat-card--blue">
           <div className="stat-card-value">{loading ? '…' : stats.roadmaps}</div>

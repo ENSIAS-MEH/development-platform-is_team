@@ -20,13 +20,11 @@ export default function MentorRoadmapsPage() {
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const mentorLabel = user ? `${user.firstName} ${user.lastName}`.trim() : '';
-
   const load = useCallback(() =>
     roadmapsAPI.getAll().then((data) => {
-      const mine = (data ?? []).filter((r) => r.mentorName === mentorLabel);
+      const mine = (data ?? []).filter((r) => r.mentorName === user?.email);
       setRoadmaps(mine);
-    }), [mentorLabel]);
+    }), [user?.email]);
 
   useEffect(() => {
     load().finally(() => setLoading(false));
