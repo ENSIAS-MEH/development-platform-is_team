@@ -27,9 +27,10 @@ services:
   
   # Backend Spring Boot
   backend:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.backend
+    #build:
+      #context: .
+      #dockerfile: docker/Dockerfile.backend
+    image: elansarioumaima/mentorpath-backend:latest
     container_name: mentorpath_backend
     ports:
       - "${BACKEND_PORT}:8080"
@@ -46,9 +47,10 @@ services:
 
   # Frontend React
   frontend:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.frontend
+    #build:
+      #context: .
+      #dockerfile: docker/Dockerfile.frontend
+    image: elansarioumaima/mentorpath-frontend:latest
     container_name: mentorpath_frontend
     ports:
       - "${FRONTEND_PORT}:80"
