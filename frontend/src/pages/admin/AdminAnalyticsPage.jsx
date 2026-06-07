@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import { adminAPI } from '../../api/admin';
 import { roadmapsAPI } from '../../api/roadmaps';
 import { mentorsAPI } from '../../api/mentors';
+import { FILIERES } from '../../api/utils';
 import './Admin.css';
 
 export default function AdminAnalyticsPage() {
   const [roadmaps, setRoadmaps] = useState([]);
   const [mentors, setMentors] = useState([]);
+  const [students, setStudents] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([roadmapsAPI.getAll(), mentorsAPI.search()])
-      .then(([rm, mt]) => {
+    Promise.all([adminAPI.getStats(), roadmapsAPI.getAll(), mentorsAPI.search()])
+      .then(([stats, rm, mt]) => {
+        setStudents(stats?.students ?? 0);
         setRoadmaps(rm ?? []);
         setMentors(mt ?? []);
       })
@@ -27,8 +31,6 @@ export default function AdminAnalyticsPage() {
       ? (mentors.reduce((acc, m) => acc + Number(m.rating || 0), 0) / mentors.length).toFixed(1)
       : '—';
 
-  const totalEnrollments = roadmaps.reduce((acc, r) => acc + (r.enrollmentCount || 0), 0);
-
   return (
     <div className="admin-page">
       <div className="page-header">
@@ -37,13 +39,13 @@ export default function AdminAnalyticsPage() {
       </div>
 
       <div className="stat-cards">
+        <div className="stat-card stat-card--teal">
+          <div className="stat-card-value">{loading ? '…' : students}</div>
+          <div className="stat-card-label">Étudiants</div>
+        </div>
         <div className="stat-card stat-card--blue">
           <div className="stat-card-value">{loading ? '…' : roadmaps.length}</div>
           <div className="stat-card-label">Roadmaps</div>
-        </div>
-        <div className="stat-card stat-card--teal">
-          <div className="stat-card-value">{loading ? '…' : totalEnrollments}</div>
-          <div className="stat-card-label">Inscriptions totales</div>
         </div>
         <div className="stat-card stat-card--amber">
           <div className="stat-card-value">{loading ? '…' : mentors.length}</div>
@@ -95,5 +97,3 @@ export default function AdminAnalyticsPage() {
     </div>
   );
 }
-
-const FILIERES = ['2IA', 'BI', 'GL', 'IDF', 'IDSIT', 'SSE', 'SSI'];

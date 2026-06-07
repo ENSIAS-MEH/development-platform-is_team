@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { adminAPI } from '../../api/admin';
 import { roadmapsAPI } from '../../api/roadmaps';
-import { mentorsAPI } from '../../api/mentors';
 import './Admin.css';
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ roadmaps: 0, mentors: 0 });
+  const [stats, setStats] = useState({ students: 0, mentors: 0, roadmaps: 0 });
   const [roadmaps, setRoadmaps] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([roadmapsAPI.getAll(), mentorsAPI.search()])
-      .then(([rm, mt]) => {
+    Promise.all([adminAPI.getStats(), roadmapsAPI.getAll()])
+      .then(([platformStats, rm]) => {
+        setStats(platformStats ?? { students: 0, mentors: 0, roadmaps: 0 });
         setRoadmaps(rm ?? []);
-        setStats({ roadmaps: (rm ?? []).length, mentors: (mt ?? []).length });
       })
       .finally(() => setLoading(false));
   }, []);
@@ -25,6 +25,10 @@ export default function AdminDashboard() {
       </div>
 
       <div className="stat-cards">
+        <div className="stat-card stat-card--teal">
+          <div className="stat-card-value">{loading ? '…' : stats.students}</div>
+          <div className="stat-card-label">Étudiants inscrits</div>
+        </div>
         <div className="stat-card stat-card--blue">
           <div className="stat-card-value">{loading ? '…' : stats.roadmaps}</div>
           <div className="stat-card-label">Roadmaps publiées</div>

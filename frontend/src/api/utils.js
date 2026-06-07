@@ -15,7 +15,7 @@ export function toApiDateTime(localValue) {
   return localValue.length === 16 ? `${localValue}:00` : localValue;
 }
 
-export const FILIERES = ['2IA', 'BI', 'GL', 'IDF', 'IDSIT', 'SSE', 'SSI'];
+export const FILIERES = ['2IA', 'BI', 'GD', 'GL', 'IDF', 'IDSIT', 'SSE', 'SSI'];
 
 export const SESSION_STATUS_LABEL = {
   PENDING: { label: 'En attente', className: 'status-pending' },

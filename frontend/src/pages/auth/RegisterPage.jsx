@@ -3,14 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getHomePath } from '../../routes/PrivateRoute';
 import toast from 'react-hot-toast';
+import { FILIERES } from '../../api/utils';
 import './Auth.css';
 
 const ROLES = [
   { value: 'STUDENT', label: 'Étudiant' },
   { value: 'MENTOR', label: 'Mentor' },
 ];
-
-const FILIERES = ['2IA', 'BI', 'GL', 'IDF', 'IDSIT', 'SSE', 'SSI'];
 
 const ANNEES_ETUDE = [
   { value: '1', label: '1ère année' },

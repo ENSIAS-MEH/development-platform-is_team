@@ -4,7 +4,7 @@ import { authAPI } from '../../api/auth';
 import toast from 'react-hot-toast';
 import './Profile.css';
 
-const FILIERES = ['2IA', 'BI', 'GL', 'IDF', 'IDSIT', 'SSE', 'SSI'];
+import { FILIERES } from '../../api/utils';
 
 const ANNEES_ETUDE = [
   { value: '1', label: '1ère année' },
