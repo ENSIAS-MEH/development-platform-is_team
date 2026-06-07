@@ -22,38 +22,32 @@ jobs:
           username: ${{ secrets.AWS_EC2_USER }}
           key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/mentorpath || mkdir -p /home/ubuntu/mentorpath
-            cd /home/ubuntu/mentorpath
+            set -e
 
-            # Cloner le repository pour récupérer docker-compose.yml
-            if [ -d "development-platform-is_team" ]; then
-                cd development-platform-is_team && git pull
+            APP_DIR="/home/ubuntu/mentorpath/development-platform-is_team"
+
+            # ── 1. Clone or pull the repo ──────────────────────────────────
+            if [ -d "$APP_DIR" ]; then
+              cd "$APP_DIR" && git pull
             else
-                git clone https://github.com/ENSIAS-MEH/development-platform-is_team.git
-                cd development-platform-is_team
+              mkdir -p /home/ubuntu/mentorpath
+              git clone https://github.com/ENSIAS-MEH/development-platform-is_team.git "$APP_DIR"
+              cd "$APP_DIR"
             fi
-            
-            # Create .env from secrets
-            cat > .env << 'EOF'
-            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
-            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            POSTGRES_PORT=5432
-            REDIS_PORT=6379
-            BACKEND_PORT=8080
-            FRONTEND_PORT=4200
-            EOF
-            
-            # Login to Docker Hub
+
+            # ── 2. Login to Docker Hub ─────────────────────────────────────
             echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ env.DOCKERHUB_USERNAME }} --password-stdin
+
+            # ── 3. Pull latest images ──────────────────────────────────────
+            docker pull ${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:latest
+            docker pull ${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:latest
+
+            # ── 4. Deploy ──────────────────────────────────────────────────
+            docker compose up -d --remove-orphans
+
+            # ── 5. Status ──────────────────────────────────────────────────
+            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
             
-            # Pull and deploy
-            docker compose pull
-            docker compose up -d
-            
-            # Show status
-            docker ps
   notify:
     name: Send Email Notification
     needs: deploy

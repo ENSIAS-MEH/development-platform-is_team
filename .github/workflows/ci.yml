@@ -45,6 +45,9 @@ jobs:
       # 1. Check out the repository source code
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # Fetch all history for all branches and tags to ensure we have the full Git context
+          fetch-depth: 0
 
       # 2. Install Java 17 (Temurin distribution)
       - name: Setup Java 17
@@ -103,14 +106,13 @@ jobs:
           scan-type: "fs"
           scan-ref: "./backend"
       # 9. SonarQube static analysis (disabled — enable when token is ready)
-      # - name: SonarQube Analysis
-      #   run: |
-      #     ./mvnw sonar:sonar \
-      #     -Dsonar.projectKey=ENSIAS-MEH_development-platform-is_team \
-      #     -Dsonar.organization=ensias-meh \
-      #     -Dsonar.host.url=https://sonarcloud.io \
-      #     -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-      #   working-directory: backend
+      - name: SonarQube Analysis
+        run: |
+          ./mvnw sonar:sonar \
+            -Dsonar.projectKey=mentorpath-backend \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+        working-directory: backend
 
       # 10. Package the application as a JAR (tests already ran above)
       - name: Build JAR
@@ -163,6 +165,11 @@ jobs:
       # 1. Check out the repository source code
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # Fetch all history for all branches and tags to ensure we have the full Git context
+          # required by Sonarqube
+          fetch-depth: 0
+
 
       # 2. Install Node.js 20 (LTS) for building and testing the React app
       - name: Setup Node.js
@@ -203,13 +210,15 @@ jobs:
           scan-ref: "./frontend"
 
       # 8. SonarQube static analysis (disabled — enable when token is ready)
-      # - name: SonarQube Analysis
-      #   uses: SonarSource/sonarqube-scan-action@master
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      #   with:
-      #     projectBaseDir: frontend
+      - name: SonarQube Analysis
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          projectBaseDir: frontend
+          args: >
+            -Dsonar.projectKey=mentorpath-frontend
 
       # 9. Compile and bundle the React app for production
       - name: Build frontend
