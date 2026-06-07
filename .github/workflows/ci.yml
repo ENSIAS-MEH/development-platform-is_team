@@ -111,7 +111,7 @@ jobs:
           ./mvnw sonar:sonar \
             -Dsonar.projectKey=mentorpath-backend \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         working-directory: backend
 
       # 10. Package the application as a JAR (tests already ran above)
