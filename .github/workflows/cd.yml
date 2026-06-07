@@ -31,7 +31,7 @@ jobs:
               cd "$APP_DIR" && git pull
             else
               mkdir -p /home/ubuntu/mentorpath
-              git clone https://github.com/ENSIAS-MEH/development-platform-is_team.git "$APP_DIR"
+              git clone -b develop https://github.com/ENSIAS-MEH/development-platform-is_team.git "$APP_DIR"
             fi
 
             cd "$APP_DIR"  # ← add this line
