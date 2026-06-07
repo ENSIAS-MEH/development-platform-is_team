@@ -1,5 +1,6 @@
 package ma.ensias.mentorpath.user.repository;
 
+import ma.ensias.mentorpath.user.entity.Role;
 import ma.ensias.mentorpath.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,4 +19,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     /** Vérifie si un email est déjà pris (utilisé lors de l'inscription). */
     boolean existsByEmail(String email);
+
+    long countByRole(Role role);
 }

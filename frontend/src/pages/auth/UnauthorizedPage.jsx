@@ -1,25 +1,31 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { getHomePath } from '../../routes/PrivateRoute';
+import './Auth.css';
 
 export default function UnauthorizedPage() {
-  const navigate = useNavigate();
   const { user } = useAuth();
-
-  const goHome = () => {
-    if (user?.role === 'ADMIN') navigate('/admin/dashboard');
-    else if (user?.role === 'MENTOR') navigate('/mentor/sessions');
-    else navigate('/student/roadmaps');
-  };
+  const navigate = useNavigate();
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-      <div style={{ fontSize: '4rem' }}>🚫</div>
-      <h1 style={{ fontSize: '1.5rem', color: 'var(--gray-900)' }}>Accès refusé</h1>
-      <p style={{ color: 'var(--gray-500)', fontSize: '0.9rem' }}>Vous n'avez pas les droits pour accéder à cette page.</p>
-      <button className="btn-primary" onClick={goHome} style={{ marginTop: 8 }}>
-        Retour à l'accueil
-      </button>
+    <div className="auth-page" style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <div className="auth-card" style={{ maxWidth: 420, textAlign: 'center' }}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚫</div>
+        <h2 className="auth-title">Accès refusé</h2>
+        <p className="auth-hint" style={{ marginBottom: '1.5rem' }}>
+          Vous n&apos;avez pas les droits pour accéder à cette page.
+        </p>
+        {user ? (
+          <button type="button" className="btn-primary btn-full" onClick={() => navigate(getHomePath(user.role))}>
+            Retour à mon espace
+          </button>
+        ) : (
+          <Link to="/login" className="btn-primary btn-full" style={{ display: 'inline-block' }}>
+            Se connecter
+          </Link>
+        )}
+      </div>
     </div>
   );
 }

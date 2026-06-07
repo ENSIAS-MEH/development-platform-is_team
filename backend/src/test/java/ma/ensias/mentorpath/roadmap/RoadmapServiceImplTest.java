@@ -210,7 +210,7 @@ class RoadmapServiceImplTest {
     @Test
     @DisplayName("getAllRoadmaps() – doit retourner la liste complète")
     void shouldGetAllRoadmaps() {
-        when(roadmapRepository.searchRoadmaps(null, null)).thenReturn(List.of(roadmap));
+        when(roadmapRepository.findAll()).thenReturn(List.of(roadmap));
         when(enrollmentRepository.findByRoadmapId(any())).thenReturn(List.of());
 
         List<RoadmapResponse> result = roadmapService.getAllRoadmaps(null, null);
@@ -222,7 +222,7 @@ class RoadmapServiceImplTest {
     @Test
     @DisplayName("getAllRoadmaps() – liste vide si aucune roadmap")
     void shouldReturnEmptyListWhenNoRoadmaps() {
-        when(roadmapRepository.searchRoadmaps(any(), any())).thenReturn(List.of());
+        when(roadmapRepository.findByFiliere("inconnu")).thenReturn(List.of());
 
         List<RoadmapResponse> result = roadmapService.getAllRoadmaps("inconnu", null);
 

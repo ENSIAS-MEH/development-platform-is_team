@@ -1,70 +1,120 @@
-# Getting Started with Create React App
+# MentorPath — Frontend (M3)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Rôle :** Frontend & UX · React 18 · React Router v6 · Axios · react-hot-toast  
+**Prof.** EL HAMLAOUI Mahmoud · ENSIAS · 2025/2026
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Stack & architecture
 
-### `npm start`
+| Couche | Choix | Justification |
+|--------|--------|---------------|
+| UI | React 18 (CRA) | Écosystème mature, équipe M3 |
+| Routing | React Router v6 | Guards par rôle, nested routes |
+| HTTP | Axios | Intercepteurs JWT + toasts centralisés [§6] |
+| État auth | Context API | Suffisant pour F01/F02 sans Redux |
+| Feedback | react-hot-toast | Messages d’erreur user-friendly [§6] |
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+frontend/src/
+├── api/           client.js, auth.js, users.js
+├── context/       AuthContext.jsx
+├── routes/        PrivateRoute, RoleRoute, getHomePath
+├── hooks/         useNotifications (polling F12)
+├── components/    AppLayout, StarRating, ComingSoon, NotificationBell
+└── pages/         auth, student, mentor, admin
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Le frontend consomme le backend Spring Boot M1 (`REACT_APP_API_URL`, défaut `http://localhost:8080/api`). Format de réponse attendu :
 
-### `npm test`
+```json
+{ "success": true, "message": "...", "data": { ... } }
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+JWT : `localStorage.token` + header `Authorization: Bearer <token>`.
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Démarrage
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm start          # http://localhost:3000
+npm test           # tests Jest
+npm run build      # build production (Docker / Nginx)
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Comptes seed (backend M1)** : voir `V2__seed.sql` — mot de passe `Pasword123`  
+**Swagger backend** : http://localhost:8080/swagger-ui.html
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Checklist M3 — fonctionnalités UI
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| ID | Page / composant | Route | Backend |
+|----|------------------|-------|---------|
+| F01 | Inscription / Connexion | `/register`, `/login` | ✅ M1 |
+| F02 | Profil (avatar initiales, édition) | `/*/profile` | ✅ M1 |
+| F03 | Roadmaps mentor (placeholder) | `/mentor/roadmaps` | ⏳ M2 |
+| F04 | Suivi roadmaps étudiant | `/student/roadmaps` | ⏳ M2 |
+| F05 | Sessions étudiant | `/student/sessions` | ⏳ M2 |
+| F06 | Agenda mentor | `/mentor/sessions` | ⏳ M2 |
+| F07 | Messagerie | `/mentor/messages` | ⏳ M2 |
+| F08 | Notation mentor (étoiles + modal) | `/student/mentors` | ⏳ M2 |
+| F09 | Dashboard admin modération | `/admin/dashboard` | selon M1/M2 |
+| F10 | Dashboard analytique | `/admin/analytics` | mock → API stats |
+| F11 | Recherche mentors (filtres) | `/student/mentors` | `GET /users?role=MENTOR` |
+| F12 | Notifications (polling 30s) | cloche topbar | ⏳ `/notifications` |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+**§6** — Guards `PrivateRoute` + `RoleRoute` (STUDENT / MENTOR / ADMIN), intercepteur 401 → `/login`, toasts sur erreurs API.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## Branche Git (équipe)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feature/m3-frontend
+# … travail …
+git add frontend/
+git commit -m "feat(frontend): app React MentorPath M3 closes #N"
+git push origin feature/m3-frontend
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Ouvrir une **Pull Request vers `develop`**.
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Défis & solutions
 
-### Analyzing the Bundle Size
+1. **Backend partiel (M1 seul)** — Pages M2 en `ComingSoon` + appels `silent` pour éviter des toasts inutiles sur 404.
+2. **JWT expiré** — Intercepteur Axios redirige vers `/login` sans boucle sur les pages publiques.
+3. **Rôles multiples** — `getHomePath(role)` centralise la redirection après login/register.
+4. **Notifications sans WebSocket** — Hook `useNotifications` en polling jusqu’à livraison M2.
+5. **Docker** — Le Dockerfile du repo attend le dossier `frontend/` et `npm run build` → servir `/build` via Nginx.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## Captures UI
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+À ajouter dans `docs/screenshots/` après validation visuelle :
 
-### Advanced Configuration
+- Login / Register
+- Profil étudiant
+- Recherche mentors
+- Dashboard admin
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+## Tests
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+npm test -- --watchAll=false
+```
 
-### `npm run build` fails to minify
+Test unitaire : formulaire de connexion (`App.test.js`).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**Bonus** : Cypress / Playwright — non inclus ; à ajouter sur branche dédiée si demandé.

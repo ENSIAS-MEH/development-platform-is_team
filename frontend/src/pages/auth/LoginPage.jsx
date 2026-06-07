@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { getHomePath } from '../../routes/PrivateRoute';
 import toast from 'react-hot-toast';
 import './Auth.css';
 
@@ -28,16 +29,17 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      return;
+    }
     setLoading(true);
     try {
       const user = await login(form);
       toast.success(`Bienvenue, ${user.firstName} !`);
-      if (user.role === 'ADMIN') navigate('/admin/dashboard');
-      else if (user.role === 'MENTOR') navigate('/mentor/sessions');
-      else navigate('/student/roadmaps');
+      navigate(getHomePath(user.role));
     } catch {
-      // errors handled by interceptor
+      /* intercepteur axios */
     } finally {
       setLoading(false);
     }
@@ -51,20 +53,25 @@ export default function LoginPage() {
           <span className="auth-brand-name">MentorPath</span>
         </div>
         <h1 className="auth-tagline">Trouvez votre mentor,<br />tracez votre parcours.</h1>
-        <p className="auth-sub">La plateforme qui connecte étudiants et mentors ENSIAS pour un accompagnement sur mesure.</p>
+        <p className="auth-sub">Plateforme ENSIAS — accompagnement étudiant / mentor.</p>
       </div>
 
       <div className="auth-right">
         <div className="auth-card">
           <h2 className="auth-title">Connexion</h2>
-          <p className="auth-hint">Pas encore de compte ? <Link to="/register" className="auth-link">S'inscrire</Link></p>
+          <p className="auth-hint">
+            Pas encore de compte ? <Link to="/register" className="auth-link">S&apos;inscrire</Link>
+          </p>
 
           <form onSubmit={handleSubmit} className="auth-form" noValidate>
             <div className="field">
               <label htmlFor="email">Email</label>
               <input
-                id="email" name="email" type="email"
-                value={form.email} onChange={handleChange}
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
                 placeholder="prenom.nom@ensias.um5.ac.ma"
                 className={errors.email ? 'input-error' : ''}
                 autoComplete="email"
@@ -75,8 +82,11 @@ export default function LoginPage() {
             <div className="field">
               <label htmlFor="password">Mot de passe</label>
               <input
-                id="password" name="password" type="password"
-                value={form.password} onChange={handleChange}
+                id="password"
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
                 placeholder="••••••••"
                 className={errors.password ? 'input-error' : ''}
                 autoComplete="current-password"

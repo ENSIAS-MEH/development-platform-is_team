@@ -2,37 +2,47 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080/api',
+  baseURL: process.env.REACT_APP_API_URL || '/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach JWT token to every request
+const PUBLIC_PATHS = ['/login', '/register', '/unauthorized'];
+
+function extractErrorMessage(error) {
+  const data = error?.response?.data;
+  const message = data?.message;
+
+  if (data?.data && typeof data.data === 'object' && !Array.isArray(data.data)) {
+    const fieldMsg = Object.values(data.data).find(Boolean);
+    if (fieldMsg) return String(fieldMsg);
+  }
+
+  if (message) return message;
+  if (!error?.response) {
+    return 'Impossible de joindre le serveur. Vérifiez que le backend tourne sur le port 8080 (PostgreSQL + Spring Boot).';
+  }
+  return null;
+}
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Handle responses globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
-    const message = error?.response?.data?.message;
+    const isPublicPage = PUBLIC_PATHS.some((p) => window.location.pathname.startsWith(p));
+    const msg = extractErrorMessage(error);
 
-    if (status === 401) {
+    if (status === 401 && !isPublicPage) {
       localStorage.removeItem('token');
-      localStorage.removeItem('user');
       window.location.href = '/login';
       toast.error('Session expirée, veuillez vous reconnecter.');
-    } else if (status === 403) {
-      toast.error('Accès refusé.');
-    } else if (status === 404) {
-      toast.error(message || 'Ressource introuvable.');
-    } else if (status >= 500) {
-      toast.error('Erreur serveur, réessayez plus tard.');
-    } else if (message) {
-      toast.error(message);
+    } else if (msg && !error.config?.silent) {
+      toast.error(msg);
     }
 
     return Promise.reject(error);

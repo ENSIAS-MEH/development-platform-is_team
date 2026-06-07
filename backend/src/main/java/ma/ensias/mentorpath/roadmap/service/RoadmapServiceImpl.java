@@ -83,8 +83,21 @@ public class RoadmapServiceImpl implements RoadmapService {
 
     @Override
     public List<RoadmapResponse> getAllRoadmaps(String filiere, String keyword) {
-        return roadmapRepository.searchRoadmaps(filiere, keyword)
-            .stream()
+        boolean hasFiliere = filiere != null && !filiere.isBlank();
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+
+        List<Roadmap> roadmaps;
+        if (hasFiliere && hasKeyword) {
+            roadmaps = roadmapRepository.searchByFiliereAndKeyword(filiere, keyword);
+        } else if (hasFiliere) {
+            roadmaps = roadmapRepository.findByFiliere(filiere);
+        } else if (hasKeyword) {
+            roadmaps = roadmapRepository.searchByKeyword(keyword);
+        } else {
+            roadmaps = roadmapRepository.findAll();
+        }
+
+        return roadmaps.stream()
             .map(r -> toResponse(r, null))
             .collect(Collectors.toList());
     }
