@@ -1,0 +1,9 @@
+# Terraform state — contient des secrets !
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Variables locales avec secrets
+terraform.tfvars
+*.auto.tfvars

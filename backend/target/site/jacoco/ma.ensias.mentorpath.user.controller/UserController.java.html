@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mentorpath</a> &gt; <a href="index.source.html" class="el_package">ma.ensias.mentorpath.user.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package ma.ensias.mentorpath.user.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import ma.ensias.mentorpath.common.ApiResponse;
+import ma.ensias.mentorpath.user.dto.UpdateProfileRequest;
+import ma.ensias.mentorpath.user.dto.UserDTO;
+import ma.ensias.mentorpath.user.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * Contrôleur de gestion des profils utilisateurs.
+ * Tous les endpoints nécessitent un token JWT valide.
+ *
+ * Authentication auth → Spring Security injecte automatiquement
+ * l'utilisateur connecté depuis le SecurityContext.
+ */
+@RestController
+@RequestMapping(&quot;/api/users&quot;)
+@RequiredArgsConstructor
+@Tag(name = &quot;Profil utilisateur&quot;, description = &quot;Lecture et mise à jour du profil&quot;)
+@SecurityRequirement(name = &quot;BearerAuth&quot;)
+public class UserController {
+
+    private final UserService userService;
+
+    /**
+     * Récupère le profil de l'utilisateur connecté.
+     * GET /api/users/me
+     */
+    @GetMapping(&quot;/me&quot;)
+    @PreAuthorize(&quot;hasAnyRole('STUDENT', 'MENTOR', 'ADMIN')&quot;)
+    @Operation(summary = &quot;Voir mon profil&quot;)
+    public ResponseEntity&lt;ApiResponse&lt;UserDTO&gt;&gt; getMyProfile(Authentication auth) {
+<span class="nc" id="L41">        UserDTO profile = userService.getProfile(auth.getName());</span>
+<span class="nc" id="L42">        return ResponseEntity.ok(ApiResponse.success(&quot;Profil récupéré&quot;, profile));</span>
+    }
+
+    /**
+     * Met à jour le profil de l'utilisateur connecté.
+     * PUT /api/users/me
+     */
+    @PutMapping(&quot;/me&quot;)
+    @PreAuthorize(&quot;hasAnyRole('STUDENT', 'MENTOR')&quot;)
+    @Operation(summary = &quot;Modifier mon profil&quot;)
+    public ResponseEntity&lt;ApiResponse&lt;UserDTO&gt;&gt; updateMyProfile(
+            @Valid @RequestBody UpdateProfileRequest request,
+            Authentication auth) {
+
+<span class="nc" id="L56">        UserDTO updated = userService.updateProfile(auth.getName(), request);</span>
+<span class="nc" id="L57">        return ResponseEntity.ok(ApiResponse.success(&quot;Profil mis à jour&quot;, updated));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mentorpath</a> &gt; <a href="index.source.html" class="el_package">ma.ensias.mentorpath.security</a> &gt; <span class="el_source">JwtUtil.java</span></div><h1>JwtUtil.java</h1><pre class="source lang-java linenums">package ma.ensias.mentorpath.security;
+
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.util.Date;
+
+/**
+ * Utilitaire JWT : génération, validation et extraction des claims.
+ * Utilise HMAC-SHA256 avec une clé dérivée du secret applicatif.
+ */
+@Component
+<span class="nc" id="L16">public class JwtUtil {</span>
+
+    @Value(&quot;${app.jwt.secret}&quot;)
+    private String secret;
+
+    @Value(&quot;${app.jwt.expiration}&quot;)
+    private long expirationMs;
+
+    // ── Génération ───────────────────────────────────────────────────────────
+
+    /**
+     * Génère un token JWT signé pour un utilisateur.
+     *
+     * @param email email de l'utilisateur (subject)
+     * @param role  rôle de l'utilisateur (claim)
+     * @return token JWT sous forme de String
+     */
+    public String generateToken(String email, String role) {
+<span class="nc" id="L34">        return Jwts.builder()</span>
+<span class="nc" id="L35">                .setSubject(email)</span>
+<span class="nc" id="L36">                .claim(&quot;role&quot;, role)</span>
+<span class="nc" id="L37">                .setIssuedAt(new Date())</span>
+<span class="nc" id="L38">                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))</span>
+<span class="nc" id="L39">                .signWith(getKey(), SignatureAlgorithm.HS256)</span>
+<span class="nc" id="L40">                .compact();</span>
+    }
+
+    // ── Extraction ───────────────────────────────────────────────────────────
+
+    /** Extrait l'email (subject) depuis un token. */
+    public String extractEmail(String token) {
+<span class="nc" id="L47">        return getClaims(token).getSubject();</span>
+    }
+
+    /** Extrait le rôle depuis un token. */
+    public String extractRole(String token) {
+<span class="nc" id="L52">        return getClaims(token).get(&quot;role&quot;, String.class);</span>
+    }
+
+    // ── Validation ───────────────────────────────────────────────────────────
+
+    /**
+     * Vérifie que le token est bien signé et non expiré.
+     *
+     * @param token le token JWT brut
+     * @return true si le token est valide
+     */
+    public boolean isTokenValid(String token) {
+        try {
+<span class="nc" id="L65">            getClaims(token);</span>
+<span class="nc" id="L66">            return true;</span>
+<span class="nc" id="L67">        } catch (JwtException | IllegalArgumentException e) {</span>
+<span class="nc" id="L68">            return false;</span>
+        }
+    }
+
+    // ── Privé ─────────────────────────────────────────────────────────────────
+
+    private Claims getClaims(String token) {
+<span class="nc" id="L75">        return Jwts.parserBuilder()</span>
+<span class="nc" id="L76">                .setSigningKey(getKey())</span>
+<span class="nc" id="L77">                .build()</span>
+<span class="nc" id="L78">                .parseClaimsJws(token)</span>
+<span class="nc" id="L79">                .getBody();</span>
+    }
+
+    private Key getKey() {
+<span class="nc" id="L83">        return Keys.hmacShaKeyFor(secret.getBytes());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

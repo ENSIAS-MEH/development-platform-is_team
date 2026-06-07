@@ -1,0 +1,33 @@
+# ================================
+# STAGE 1 : Build
+# On utilise Maven pour compiler le projet Spring Boot
+# ================================
+FROM maven:3.9-eclipse-temurin-21 AS builder
+
+# Définir le dossier de travail dans le container
+WORKDIR /app
+
+# Copier les fichiers Maven en premier (optimisation du cache Docker)
+COPY backend/pom.xml .
+RUN mvn dependency:go-offline
+
+# Copier le code source et compiler
+COPY backend/src ./src
+RUN mvn clean package -DskipTests
+
+# ================================
+# STAGE 2 : Run
+# Image légère pour exécuter l'application
+# ================================
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+# Copier uniquement le JAR compilé depuis le stage 1
+COPY --from=builder /app/target/*.jar app.jar
+
+# Port exposé par Spring Boot
+EXPOSE 8080
+
+# Commande de démarrage
+ENTRYPOINT ["java", "-jar", "app.jar"]

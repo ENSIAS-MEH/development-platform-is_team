@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mentorpath</a> &gt; <a href="index.source.html" class="el_package">ma.ensias.mentorpath.auth.service.impl</a> &gt; <span class="el_source">AuthServiceImpl.java</span></div><h1>AuthServiceImpl.java</h1><pre class="source lang-java linenums">package ma.ensias.mentorpath.auth.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import ma.ensias.mentorpath.auth.dto.JwtResponse;
+import ma.ensias.mentorpath.auth.dto.LoginRequest;
+import ma.ensias.mentorpath.auth.dto.RegisterRequest;
+import ma.ensias.mentorpath.auth.service.AuthService;
+import ma.ensias.mentorpath.exception.EmailAlreadyUsedException;
+import ma.ensias.mentorpath.security.JwtUtil;
+import ma.ensias.mentorpath.user.entity.*;
+import ma.ensias.mentorpath.user.repository.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Implémentation du service d'authentification.
+ *
+ * Responsabilités :
+ *  1. Valider l'unicité de l'email
+ *  2. Hasher le mot de passe (BCrypt)
+ *  3. Créer l'entité User en base
+ *  4. Créer le profil complémentaire (Student ou Mentor)
+ *  5. Générer et retourner le token JWT
+ */
+@Service
+@RequiredArgsConstructor
+public class AuthServiceImpl implements AuthService {
+
+    private final UserRepository           userRepository;
+    private final StudentProfileRepository studentProfileRepository;
+    private final MentorProfileRepository  mentorProfileRepository;
+    private final PasswordEncoder          passwordEncoder;
+    private final JwtUtil                  jwtUtil;
+    private final AuthenticationManager   authenticationManager;
+
+    // ── Register ─────────────────────────────────────────────────────────────
+
+    @Override
+    @Transactional
+    public JwtResponse register(RegisterRequest req) {
+
+        // 1. Vérifier l'unicité de l'email
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (userRepository.existsByEmail(req.getEmail())) {</span>
+<span class="fc" id="L46">            throw new EmailAlreadyUsedException(req.getEmail());</span>
+        }
+
+        // 2. Créer et sauvegarder l'utilisateur
+<span class="fc" id="L50">        User user = User.builder()</span>
+<span class="fc" id="L51">                .email(req.getEmail())</span>
+<span class="fc" id="L52">                .password(passwordEncoder.encode(req.getPassword()))</span>
+<span class="fc" id="L53">                .role(req.getRole())</span>
+<span class="fc" id="L54">                .build();</span>
+<span class="fc" id="L55">        userRepository.save(user);</span>
+
+        // 3. Créer le profil selon le rôle
+<span class="fc" id="L58">        createProfile(user, req);</span>
+
+        // 4. Générer le token JWT
+<span class="fc" id="L61">        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());</span>
+<span class="fc" id="L62">        return new JwtResponse(token, user.getEmail(), user.getRole().name());</span>
+    }
+
+    // ── Login ─────────────────────────────────────────────────────────────────
+
+    @Override
+    public JwtResponse login(LoginRequest req) {
+
+        // Spring Security vérifie l'email ET le mot de passe (BCrypt)
+      
+<span class="fc" id="L72">        authenticationManager.authenticate(</span>
+<span class="fc" id="L73">                new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));</span>
+
+<span class="fc" id="L75">        User user = userRepository.findByEmail(req.getEmail()).orElseThrow();</span>
+
+<span class="fc" id="L77">        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());</span>
+<span class="fc" id="L78">        return new JwtResponse(token, user.getEmail(), user.getRole().name());</span>
+    }
+
+    // ── Privé ─────────────────────────────────────────────────────────────────
+
+    /**
+     * Crée le profil complémentaire selon le rôle de l'utilisateur.
+     * ADMIN n'a pas de profil complémentaire.
+     */
+    private void createProfile(User user, RegisterRequest req) {
+<span class="pc bpc" id="L88" title="1 of 3 branches missed.">        switch (user.getRole()) {</span>
+            case STUDENT -&gt; {
+<span class="fc" id="L90">                StudentProfile profile = StudentProfile.builder()</span>
+<span class="fc" id="L91">                        .user(user)</span>
+<span class="fc" id="L92">                        .firstName(req.getFirstName())</span>
+<span class="fc" id="L93">                        .lastName(req.getLastName())</span>
+<span class="fc" id="L94">                        .filiere(req.getFiliere())</span>
+<span class="fc" id="L95">                        .anneeEtude(req.getAnneeEtude())</span>
+<span class="fc" id="L96">                        .build();</span>
+<span class="fc" id="L97">                studentProfileRepository.save(profile);</span>
+            }
+            case MENTOR -&gt; {
+<span class="fc" id="L100">                MentorProfile profile = MentorProfile.builder()</span>
+<span class="fc" id="L101">                        .user(user)</span>
+<span class="fc" id="L102">                        .firstName(req.getFirstName())</span>
+<span class="fc" id="L103">                        .lastName(req.getLastName())</span>
+<span class="fc" id="L104">                        .filiere(req.getFiliere())</span>
+<span class="fc" id="L105">                        .promo(req.getPromo())</span>
+<span class="fc" id="L106">                        .build();</span>
+<span class="fc" id="L107">                mentorProfileRepository.save(profile);</span>
+            }
+            case ADMIN -&gt; { /* Pas de profil complémentaire pour les admins */ }
+        }
+<span class="fc" id="L111">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
