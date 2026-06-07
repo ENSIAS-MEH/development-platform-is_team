@@ -162,4 +162,3 @@ minikube service backend -n mentorpath
 | M2:Imane Raiss | Backend Features & API REST |
 | M3:Aya Esoubai | Frontend & UX |
 | M4:Oumaima El ansari | DevOps, Tests & Qualité | 
-
