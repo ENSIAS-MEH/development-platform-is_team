@@ -27,15 +27,16 @@ jobs:
             APP_DIR="/home/ubuntu/mentorpath/development-platform-is_team"
 
             # ── 1. Clone or pull the repo ──────────────────────────────────
-            if [ -d "$APP_DIR" ]; then
+             if [ -d "$APP_DIR" ]; then
               cd "$APP_DIR" && git pull
             else
               mkdir -p /home/ubuntu/mentorpath
               git clone https://github.com/ENSIAS-MEH/development-platform-is_team.git "$APP_DIR"
-              cd "$APP_DIR"
             fi
 
-            # ── 2. Login to Docker Hub ─────────────────────────────────────
+            cd "$APP_DIR"  # ← add this line
+
+            # ── 2. Login to Docker Hub
             echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ env.DOCKERHUB_USERNAME }} --password-stdin
 
             # ── 3. Pull latest images ──────────────────────────────────────
