@@ -25,6 +25,8 @@ FROM nginx:alpine
 
 # Copier les fichiers buildés vers Nginx
 COPY --from=builder /app/build /usr/share/nginx/html
+# remplace la config nginx par défaut
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Port exposé par Nginx
 EXPOSE 80
