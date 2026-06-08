@@ -21,6 +21,7 @@ jobs:
           host: ${{ secrets.AWS_EC2_HOST }}
           username: ${{ secrets.AWS_EC2_USER }}
           key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          envs: POSTGRES_DB,POSTGRES_USER,POSTGRES_PASSWORD,JWT_SECRET,DOCKERHUB_PASSWORD
           script: |
             set -e
 
@@ -34,19 +35,28 @@ jobs:
               git clone -b develop https://github.com/ENSIAS-MEH/development-platform-is_team.git "$APP_DIR"
             fi
 
-            cd "$APP_DIR"  # ← add this line
+            cd "$APP_DIR"  
+            # ── 2. Write .env ──────────────────────────────────────────────
+            printf 'POSTGRES_DB=%s\n'       "$POSTGRES_DB"       > .env
+            printf 'POSTGRES_USER=%s\n'     "$POSTGRES_USER"     >> .env
+            printf 'POSTGRES_PASSWORD=%s\n' "$POSTGRES_PASSWORD" >> .env
+            printf 'JWT_SECRET=%s\n'        "$JWT_SECRET"        >> .env
+            printf 'POSTGRES_PORT=5432\n'                        >> .env
+            printf 'REDIS_PORT=6379\n'                           >> .env
+            printf 'BACKEND_PORT=8080\n'                         >> .env
+            printf 'FRONTEND_PORT=4200\n'                        >> .env
 
-            # ── 2. Login to Docker Hub
+            # ── 3. Login to Docker Hub
             echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ env.DOCKERHUB_USERNAME }} --password-stdin
 
-            # ── 3. Pull latest images ──────────────────────────────────────
+            # ── 4. Pull latest images ──────────────────────────────────────
             docker pull ${{ env.DOCKERHUB_USERNAME }}/mentorpath-backend:latest
             docker pull ${{ env.DOCKERHUB_USERNAME }}/mentorpath-frontend:latest
 
-            # ── 4. Deploy ──────────────────────────────────────────────────
+            # ── 5. Deploy ──────────────────────────────────────────────────
             docker compose up -d --remove-orphans
 
-            # ── 5. Status ──────────────────────────────────────────────────
+            # ── 6. Status ──────────────────────────────────────────────────
             docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
             
   notify:
