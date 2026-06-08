@@ -9,44 +9,52 @@ export function AuthProvider({ children }) {
 
   const loadUser = useCallback(async () => {
     const token = localStorage.getItem('token');
-    if (!token) { setLoading(false); return; }
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await authAPI.getMe();
       setUser(res.data.data);
     } catch {
       localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      setUser(null);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { loadUser(); }, [loadUser]);
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
 
   const login = async (credentials) => {
     const res = await authAPI.login(credentials);
-    const { token, ...userData } = res.data.data;
+    const { token } = res.data.data;
     localStorage.setItem('token', token);
+    const me = await authAPI.getMe();
+    const userData = me.data.data;
     setUser(userData);
     return userData;
   };
 
   const register = async (data) => {
     const res = await authAPI.register(data);
-    const { token, ...userData } = res.data.data;
+    const { token } = res.data.data;
     localStorage.setItem('token', token);
+    const me = await authAPI.getMe();
+    const userData = me.data.data;
     setUser(userData);
     return userData;
   };
 
   const logout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     setUser(null);
   };
 
   const updateUser = (updatedData) => {
-    setUser((prev) => ({ ...prev, ...updatedData }));
+    setUser((prev) => (prev ? { ...prev, ...updatedData } : prev));
   };
 
   return (
